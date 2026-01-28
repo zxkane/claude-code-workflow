@@ -1,44 +1,45 @@
 # Project Name - Claude Code Development Workflow
 
-## 项目概述
+## Project Overview
 
-[在此描述项目的核心功能和目标]
-
----
-
-## 技术栈
-
-[根据项目实际情况填写技术选型]
-
-| 组件 | 选择 | 理由 |
-|------|------|------|
-| 前端框架 | - | - |
-| 后端框架 | - | - |
-| 数据库 | - | - |
-| 测试框架 | - | - |
+[Describe your project's core functionality and goals here]
 
 ---
 
-## 开发流程 (TDD + Agent 辅助)
+## Tech Stack
 
-本项目采用严格的端到端开发流程，由 Claude Code hooks 强制执行：
+[Fill in based on your actual project]
+
+| Component | Choice | Rationale |
+|-----------|--------|-----------|
+| Frontend | - | - |
+| Backend | - | - |
+| Database | - | - |
+| Testing | - | - |
+
+---
+
+## Development Workflow (TDD + Agent-Assisted)
+
+This project enforces a strict end-to-end development workflow through Claude Code hooks:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                    Feature/Bug Fix 开发流程                          │
+│                    Feature/Bug Fix Development Flow                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  Step 1          Step 2          Step 3          Step 4            │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐      │
-│  │ 设计画布 │───▶│ 测试用例 │───▶│ 实现代码 │───▶│ 单元测试 │      │
-│  │ (Pencil) │    │ (TDD)    │    │          │    │ 本地通过 │      │
+│  │ Design   │───▶│ Test     │───▶│ Implement│───▶│ Unit     │      │
+│  │ Canvas   │    │ Cases    │    │ Code     │    │ Tests    │      │
+│  │ (Pencil) │    │ (TDD)    │    │          │    │ Pass     │      │
 │  └──────────┘    └──────────┘    └──────────┘    └──────────┘      │
 │       │                                               │             │
 │       │                                               ▼             │
 │       │         ┌──────────────────────────────────────────────┐   │
-│       │         │              Commit 前检查                    │   │
-│       │         │  1. code-simplifier agent 简化代码            │   │
-│       │         │  2. 本地 lint/type check 通过                 │   │
+│       │         │              Pre-Commit Checks                │   │
+│       │         │  1. code-simplifier agent reviews code        │   │
+│       │         │  2. Local lint/type check passes              │   │
 │       │         └──────────────────────────────────────────────┘   │
 │       │                                               │             │
 │       │         Step 5          Step 6               │             │
@@ -49,7 +50,7 @@
 │       │    │                          │                            │
 │       │    │    Step 7               ▼                             │
 │       │    │    ┌──────────────────────────────┐                   │
-│       │    │    │ 等待 GitHub CI Checks 通过   │                   │
+│       │    │    │ Wait for GitHub CI Checks    │                   │
 │       │    │    │ - Lint & Type Check          │                   │
 │       │    │    │ - Unit Tests                 │                   │
 │       │    │    │ - Build                      │                   │
@@ -58,191 +59,191 @@
 │       │    │                          ▼                            │
 │       │    │    Step 8                                             │
 │       │    │    ┌──────────────────────────────┐                   │
-│       │    │    │ E2E 测试 (Chrome DevTools)   │                   │
-│       │    │    │ 在 Preview 环境验证功能      │                   │
+│       │    │    │ E2E Tests (Chrome DevTools)  │                   │
+│       │    │    │ Verify on Preview Environment│                   │
 │       │    │    └──────────────────────────────┘                   │
 │       │    │                          │                            │
-│       │    │    ❌ 失败               ▼ ✅ 通过                    │
+│       │    │    ❌ Failed             ▼ ✅ Passed                  │
 │       │    └───────────────────  ┌──────────────┐                  │
-│       │                          │ 通知用户     │                  │
+│       │                          │ Notify User  │                  │
 │       │                          │ Peer Review  │                  │
 │       │                          └──────────────┘                  │
 │       └────────────────────────────────────────────────────────▶   │
-│                         返回 Step 1 (如需修改)                      │
+│                         Return to Step 1 (if changes needed)        │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Step 1: 设计画布 (Design Canvas)
+### Step 1: Design Canvas
 
-**工具**: Pencil (或其他设计工具)
+**Tool**: Pencil (or other design tools)
 
-- 输入: 用户需求 / PRD / Bug 描述
-- 输出: 设计画布文档 (`docs/designs/<feature>.md`)
-- 任务:
-  1. 理解需求，明确功能范围和边界
-  2. 绘制或更新设计画布，包括：
-     - 功能架构图
-     - 数据流图
-     - UI 草图 (如适用)
-     - API 设计 (如适用)
-  3. 标记设计状态为 `完成`
+- Input: User requirements / PRD / Bug description
+- Output: Design canvas document (`docs/designs/<feature>.md`)
+- Tasks:
+  1. Understand requirements, define scope and boundaries
+  2. Create or update design canvas including:
+     - Feature architecture diagram
+     - Data flow diagram
+     - UI mockups (if applicable)
+     - API design (if applicable)
+  3. Mark design status as `Complete`
 
-### Step 2: 测试用例设计 (Test First - 必须最先执行)
+### Step 2: Test Case Design (Test First - Mandatory)
 
-**⚠️ 这是强制性步骤，必须在写任何功能代码之前完成**
+**⚠️ This is a mandatory step that must be completed before writing any implementation code**
 
-- 输入: 设计画布 + PRD 功能需求
-- 输出: 测试用例文档 + 测试骨架代码
-- 任务:
-  1. 深入理解设计和需求，识别所有用户场景和边界条件
-  2. 编写测试用例文档: `docs/test-cases/<feature>.md`
-     - 列出所有测试场景 (正常流程、边界条件、错误处理)
-     - 为每个场景分配测试 ID (e.g., `TC-AUTH-001`)
-     - 定义预期结果和验收标准
-  3. 创建 E2E 测试骨架 (如适用)
-  4. 创建单元测试骨架
+- Input: Design canvas + PRD requirements
+- Output: Test case document + test skeleton code
+- Tasks:
+  1. Deeply understand design and requirements, identify all user scenarios and edge cases
+  2. Write test case document: `docs/test-cases/<feature>.md`
+     - List all test scenarios (happy path, edge cases, error handling)
+     - Assign test IDs (e.g., `TC-AUTH-001`)
+     - Define expected results and acceptance criteria
+  3. Create E2E test skeleton (if applicable)
+  4. Create unit test skeleton
 
-**测试用例文档模板**: 参见 `docs/templates/test-case-template.md`
+**Test Case Document Template**: See `docs/templates/test-case-template.md`
 
-### Step 3: 功能实现
+### Step 3: Implementation
 
-- 输入: 设计画布 + 测试用例
-- 输出: 功能实现代码
-- 任务:
-  1. 参考测试用例实现功能
-  2. 确保实现覆盖所有测试场景
-  3. 本地手动验证基本功能
+- Input: Design canvas + Test cases
+- Output: Implementation code
+- Tasks:
+  1. Implement features following test cases
+  2. Ensure implementation covers all test scenarios
+  3. Manually verify basic functionality locally
 
-### Step 4: 单元测试实现与验证
+### Step 4: Unit Test Implementation & Verification
 
-- 输入: 功能实现代码 + 测试骨架
-- 输出: 完整的单元测试，全部通过
-- 任务:
-  1. 实现所有单元测试
-     - 覆盖率要求: >80%
-  2. 运行单元测试
-  3. 修复失败的测试
-  4. 确保所有测试通过
+- Input: Implementation code + Test skeleton
+- Output: Complete unit tests, all passing
+- Tasks:
+  1. Implement all unit tests
+     - Coverage requirement: >80%
+  2. Run unit tests
+  3. Fix failing tests
+  4. Ensure all tests pass
 
-### Step 5: 代码审查 (Commit 前)
+### Step 5: Code Review (Pre-Commit)
 
-**⚠️ Hook 强制执行 - commit 前必须完成**
+**⚠️ Hook enforced - must complete before commit**
 
-- 输入: 功能代码 + 测试代码
-- 输出: code-simplifier 审查通过
-- 任务:
-  1. 运行 code-simplifier agent 简化代码：
+- Input: Feature code + Test code
+- Output: code-simplifier review passed
+- Tasks:
+  1. Run code-simplifier agent:
      ```
      Use Task tool with subagent_type: code-simplifier:code-simplifier
      ```
-  2. 处理简化建议
-  3. 标记完成:
+  2. Address simplification suggestions
+  3. Mark as complete:
      ```bash
      .claude/hooks/state-manager.sh mark code-simplifier
      ```
 
-### Step 6: PR 审查 (Push 前)
+### Step 6: PR Review (Pre-Push)
 
-**⚠️ Hook 强制执行 - push 前必须完成**
+**⚠️ Hook enforced - must complete before push**
 
-- 输入: 已 commit 的代码
-- 输出: PR review 审查通过
-- 任务:
-  1. 运行 PR review agent:
+- Input: Committed code
+- Output: PR review passed
+- Tasks:
+  1. Run PR review agent:
      ```
      /pr-review-toolkit:review-pr
      ```
-  2. 处理 findings:
-     - 🔴 Critical/Severe: 必须修复
-     - 🟠 High: 必须修复
-     - 🟡 Medium: 建议修复
-     - 🟢 Low: 可选修复
-  3. 解决问题后标记:
+  2. Address findings:
+     - 🔴 Critical/Severe: Must fix
+     - 🟠 High: Must fix
+     - 🟡 Medium: Should fix
+     - 🟢 Low: Optional
+  3. Mark as complete after resolving issues:
      ```bash
      .claude/hooks/state-manager.sh mark pr-review
      ```
 
-### Step 7: 等待 CI Checks 完成
+### Step 7: Wait for CI Checks
 
-**⚠️ Hook 强制执行 - 任务完成前必须验证**
+**⚠️ Hook enforced - must verify before task completion**
 
-- 输入: GitHub PR
-- 输出: 所有 CI/CD checks 通过
-- 需要通过的 Checks:
+- Input: GitHub PR
+- Output: All CI/CD checks pass
+- Required Checks:
   - ✅ Lint & Type Check
   - ✅ Unit Tests
   - ✅ Build
-- 如果任何 check 失败 → 返回 Step 3 修复
+- If any check fails → Return to Step 3 to fix
 
-### Step 8: E2E 测试验证
+### Step 8: E2E Test Verification
 
-**⚠️ Hook 强制执行 - 任务完成前必须执行**
+**⚠️ Hook enforced - must execute before task completion**
 
-- 输入: CI Checks 全部通过
-- 输出: E2E 测试通过
-- 任务:
-  1. 使用 Chrome DevTools MCP 测试 Preview 环境
-  2. 验证所有功能正常
-  3. 检查无控制台错误
-  4. 标记完成:
+- Input: CI Checks all passed
+- Output: E2E tests passed
+- Tasks:
+  1. Use Chrome DevTools MCP to test Preview environment
+  2. Verify all functionality works correctly
+  3. Check for console errors
+  4. Mark as complete:
      ```bash
      .claude/hooks/state-manager.sh mark e2e-tests
      ```
 
 ---
 
-## 验收检查清单
+## Acceptance Checklist
 
-每个 PR 合并前必须确认:
+Before merging any PR, confirm:
 
-- [ ] 设计画布已创建/更新 (`docs/designs/<feature>.md`)
-- [ ] 测试用例文档已创建 (`docs/test-cases/<feature>.md`)
-- [ ] 功能代码完成并通过本地验证
-- [ ] 单元测试覆盖率 >80%
-- [ ] 所有单元测试通过
-- [ ] code-simplifier agent 审查通过
-- [ ] pr-review agent 审查通过
-- [ ] **所有 GitHub PR Checks 通过**
-- [ ] E2E 测试通过 (Chrome DevTools)
-- [ ] 用户 Peer Review 完成
+- [ ] Design canvas created/updated (`docs/designs/<feature>.md`)
+- [ ] Test case document created (`docs/test-cases/<feature>.md`)
+- [ ] Feature code complete and locally verified
+- [ ] Unit test coverage >80%
+- [ ] All unit tests pass
+- [ ] code-simplifier agent review passed
+- [ ] pr-review agent review passed
+- [ ] **All GitHub PR Checks pass**
+- [ ] E2E tests pass (Chrome DevTools)
+- [ ] User Peer Review complete
 
 ---
 
-## 常用命令
+## Common Commands
 
 ```bash
-# 开发
-npm run dev                    # 启动本地开发环境
-npm run build                  # 构建项目
+# Development
+npm run dev                    # Start local development server
+npm run build                  # Build project
 
-# 测试
-npm test                       # 运行所有测试
-npm run test:coverage          # 运行测试并生成覆盖率报告
-npm run test:e2e               # 运行 E2E 测试
+# Testing
+npm test                       # Run all tests
+npm run test:coverage          # Run tests with coverage report
+npm run test:e2e               # Run E2E tests
 
-# 代码质量
-npm run lint                   # 运行 lint
-npm run lint:fix               # 运行 lint 并自动修复
-npm run typecheck              # TypeScript 类型检查
+# Code Quality
+npm run lint                   # Run linter
+npm run lint:fix               # Run linter with auto-fix
+npm run typecheck              # TypeScript type check
 
-# Hook 状态管理
-.claude/hooks/state-manager.sh list        # 查看当前状态
-.claude/hooks/state-manager.sh mark <action>   # 标记动作完成
-.claude/hooks/state-manager.sh clear <action>  # 清除状态
+# Hook State Management
+.claude/hooks/state-manager.sh list        # View current states
+.claude/hooks/state-manager.sh mark <action>   # Mark action as complete
+.claude/hooks/state-manager.sh clear <action>  # Clear state
 ```
 
 ---
 
-## 项目结构
+## Project Structure
 
 ```
 project-root/
-├── CLAUDE.md                     # 项目配置和开发流程 (本文件)
+├── CLAUDE.md                     # Project config and workflow (this file)
 ├── .claude/
-│   ├── settings.json            # Claude Code hooks 配置
-│   └── hooks/                   # Hook 脚本
-│       ├── lib.sh               # 共享工具函数
-│       ├── state-manager.sh     # 状态管理器
+│   ├── settings.json            # Claude Code hooks configuration
+│   └── hooks/                   # Hook scripts
+│       ├── lib.sh               # Shared utility functions
+│       ├── state-manager.sh     # State manager
 │       ├── check-design-canvas.sh
 │       ├── check-test-plan.sh
 │       ├── check-code-simplifier.sh
@@ -252,36 +253,36 @@ project-root/
 │       ├── post-git-push.sh
 │       └── verify-completion.sh
 ├── docs/
-│   ├── designs/                 # 设计画布文档
-│   ├── test-cases/              # 测试用例文档
-│   └── templates/               # 文档模板
-├── src/                         # 源代码
-├── tests/                       # 测试代码
+│   ├── designs/                 # Design canvas documents
+│   ├── test-cases/              # Test case documents
+│   └── templates/               # Document templates
+├── src/                         # Source code
+├── tests/                       # Test code
 │   ├── unit/
 │   └── e2e/
 └── .github/
-    └── workflows/               # GitHub Actions CI 配置
+    └── workflows/               # GitHub Actions CI config
 ```
 
 ---
 
-## 实现记录
+## Implementation Log
 
-### YYYY-MM-DD: 项目初始化
-- 创建项目结构
-- 配置 Claude Code hooks
-- 配置 CI/CD 流程
+### YYYY-MM-DD: Project Initialization
+- Create project structure
+- Configure Claude Code hooks
+- Configure CI/CD pipeline
 
 ---
 
-## 风险与缓解
+## Risks & Mitigation
 
-| 风险 | 影响 | 缓解措施 |
-|------|------|---------|
+| Risk | Impact | Mitigation |
+|------|--------|------------|
 | - | - | - |
 
 ---
 
-## 安全最佳实践
+## Security Best Practices
 
-[根据项目实际情况填写安全相关的注意事项]
+[Fill in security considerations based on your project]

@@ -1,130 +1,128 @@
 # Claude Code Development Workflow Template
 
-一个用于 Claude Code 的开发工作流模板，通过 hook 系统强制执行端到端的开发流程，确保 AI 代理按照 TDD (测试驱动开发) 和代码审查的最佳实践完成 feature 开发和 bug 修复。
+A development workflow template for Claude Code that enforces end-to-end development processes through a hook system, ensuring AI agents follow TDD (Test-Driven Development) and code review best practices for feature development and bug fixes.
 
-## 🎯 特性
+## 🎯 Features
 
-- **设计先行**: 强制在实现前创建设计画布
-- **测试驱动开发 (TDD)**: 强制在写代码前创建测试用例
-- **代码简化**: commit 前强制运行 code-simplifier agent
-- **代码审查**: push 前强制运行 pr-review agent
-- **CI 验证**: 任务完成前强制等待 CI 通过
-- **E2E 测试**: 强制在 Preview 环境执行 E2E 测试
+- **Design First**: Enforces design canvas creation before implementation
+- **Test-Driven Development (TDD)**: Enforces test case creation before writing code
+- **Code Simplification**: Blocks commits until code-simplifier agent review is complete
+- **Code Review**: Blocks pushes until pr-review agent review is complete
+- **CI Verification**: Blocks task completion until CI passes
+- **E2E Testing**: Enforces E2E test execution on Preview environment
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 .
-├── CLAUDE.md                     # 项目配置和开发流程文档
+├── CLAUDE.md                     # Project config and workflow documentation
 ├── .claude/
-│   ├── settings.json            # Claude Code hooks 配置
-│   └── hooks/                   # Hook 脚本
-│       ├── lib.sh               # 共享工具函数
-│       ├── state-manager.sh     # 工作流状态管理
-│       ├── check-design-canvas.sh   # 设计画布检查
-│       ├── check-test-plan.sh       # 测试计划检查
-│       ├── check-code-simplifier.sh # 代码简化检查
-│       ├── check-pr-review.sh       # PR 审查检查
-│       ├── check-unit-tests.sh      # 单元测试检查
-│       ├── warn-skip-verification.sh # --no-verify 警告
-│       ├── post-file-edit-reminder.sh # 文件编辑后提醒
-│       ├── post-git-action-clear.sh # Git 操作后状态清理
-│       ├── post-git-push.sh         # Push 后验证提醒
-│       └── verify-completion.sh     # 任务完成验证
+│   ├── settings.json            # Claude Code hooks configuration
+│   └── hooks/                   # Hook scripts
+│       ├── lib.sh               # Shared utility functions
+│       ├── state-manager.sh     # Workflow state management
+│       ├── check-design-canvas.sh   # Design canvas check
+│       ├── check-test-plan.sh       # Test plan check
+│       ├── check-code-simplifier.sh # Code simplification check
+│       ├── check-pr-review.sh       # PR review check
+│       ├── check-unit-tests.sh      # Unit tests check
+│       ├── warn-skip-verification.sh # --no-verify warning
+│       ├── post-file-edit-reminder.sh # Post-edit reminder
+│       ├── post-git-action-clear.sh # Git action state cleanup
+│       ├── post-git-push.sh         # Post-push verification reminder
+│       └── verify-completion.sh     # Task completion verification
 ├── docs/
-│   ├── designs/                 # 设计画布文档
-│   ├── test-cases/              # 测试用例文档
-│   └── templates/               # 文档模板
+│   ├── designs/                 # Design canvas documents
+│   ├── test-cases/              # Test case documents
+│   └── templates/               # Document templates
 │       ├── design-canvas-template.md
 │       └── test-case-template.md
-└── .github/
-    └── workflows/
-        └── ci.yml               # GitHub Actions CI 配置
+└── .github/                     # (CI workflow needs manual setup)
 ```
 
-## 🚀 使用方法
+## 🚀 Usage
 
-### 1. 从模板创建新项目
+### 1. Create a New Project from Template
 
 ```bash
-# 使用 GitHub CLI
-gh repo create my-project --template your-username/claude-code-dev-workflow-template
+# Using GitHub CLI
+gh repo create my-project --template your-username/claude-code-workflow
 
-# 或者手动克隆
-git clone https://github.com/your-username/claude-code-dev-workflow-template.git my-project
+# Or manually clone
+git clone https://github.com/your-username/claude-code-workflow.git my-project
 cd my-project
 rm -rf .git
 git init
 ```
 
-### 2. 自定义配置
+### 2. Customize Configuration
 
-1. **更新 CLAUDE.md**: 修改项目概述、技术栈等信息
-2. **调整 hook 脚本**: 根据项目需要修改文件匹配模式
-3. **配置 CI**: 根据项目需求调整 `.github/workflows/ci.yml`
+1. **Update CLAUDE.md**: Modify project overview, tech stack, etc.
+2. **Adjust hook scripts**: Modify file matching patterns based on project needs
+3. **Configure CI**: Adjust GitHub Actions workflow based on project requirements
 
-### 3. 开始开发
+### 3. Start Development
 
-使用 Claude Code 开始开发时，hooks 会自动强制执行开发流程。
+When using Claude Code for development, hooks will automatically enforce the workflow.
 
-## 🔧 开发流程
+## 🔧 Development Workflow
 
 ```
-Step 1: 设计画布 (Pencil)
+Step 1: Design Canvas (Pencil)
     ↓
-Step 2: 测试用例 (TDD)
+Step 2: Test Cases (TDD)
     ↓
-Step 3: 功能实现
+Step 3: Implementation
     ↓
-Step 4: 单元测试通过
+Step 4: Unit Tests Pass
     ↓
-Step 5: code-simplifier 审查 → commit
+Step 5: code-simplifier review → commit
     ↓
-Step 6: pr-review 审查 → push
+Step 6: pr-review review → push
     ↓
-Step 7: 等待 CI 通过
+Step 7: Wait for CI to pass
     ↓
-Step 8: E2E 测试 (Chrome DevTools)
+Step 8: E2E Tests (Chrome DevTools)
     ↓
-✅ 任务完成 → Peer Review
+✅ Task Complete → Peer Review
 ```
 
-## 📋 Hook 说明
+## 📋 Hook Reference
 
 ### PreToolUse Hooks
 
-| Hook | 触发条件 | 行为 |
-|------|---------|------|
-| check-design-canvas | git commit | 提醒创建设计文档 |
-| check-test-plan | Write/Edit 新文件 | 提醒创建测试计划 |
-| check-code-simplifier | git commit | **阻止** 未审查的 commit |
-| check-pr-review | git push | **阻止** 未审查的 push |
-| check-unit-tests | git commit | 提醒运行单元测试 |
-| warn-skip-verification | git --no-verify | 警告跳过验证 |
+| Hook | Trigger | Behavior |
+|------|---------|----------|
+| check-design-canvas | git commit | Reminds to create design docs |
+| check-test-plan | Write/Edit new file | Reminds to create test plan |
+| check-code-simplifier | git commit | **Blocks** unreviewed commits |
+| check-pr-review | git push | **Blocks** unreviewed pushes |
+| check-unit-tests | git commit | Reminds to run unit tests |
+| warn-skip-verification | git --no-verify | Warns about skipping verification |
 
 ### PostToolUse Hooks
 
-| Hook | 触发条件 | 行为 |
-|------|---------|------|
-| post-git-action-clear | git commit/push 成功 | 清理已完成的状态 |
-| post-git-push | git push 成功 | 提醒验证 CI 和 E2E |
-| post-file-edit-reminder | Write/Edit 源代码 | 提醒运行测试 |
+| Hook | Trigger | Behavior |
+|------|---------|----------|
+| post-git-action-clear | git commit/push success | Clears completed states |
+| post-git-push | git push success | Reminds CI and E2E verification |
+| post-file-edit-reminder | Write/Edit source code | Reminds to run tests |
 
 ### Stop Hook
 
-| Hook | 触发条件 | 行为 |
-|------|---------|------|
-| verify-completion | 任务结束 | **阻止** 未完成验证的任务 |
+| Hook | Trigger | Behavior |
+|------|---------|----------|
+| verify-completion | Task end | **Blocks** tasks without verification |
 
-## 🛠 状态管理
+## 🛠 State Management
 
-使用 `state-manager.sh` 管理工作流状态：
+Use `state-manager.sh` to manage workflow states:
 
 ```bash
-# 查看当前状态
+# View current states
 .claude/hooks/state-manager.sh list
 
-# 标记动作完成
+# Mark action as complete
 .claude/hooks/state-manager.sh mark design-canvas
 .claude/hooks/state-manager.sh mark test-plan
 .claude/hooks/state-manager.sh mark code-simplifier
@@ -132,57 +130,62 @@ Step 8: E2E 测试 (Chrome DevTools)
 .claude/hooks/state-manager.sh mark unit-tests
 .claude/hooks/state-manager.sh mark e2e-tests
 
-# 清除状态
+# Clear state
 .claude/hooks/state-manager.sh clear <action>
 .claude/hooks/state-manager.sh clear-all
 ```
 
-## 📝 文档模板
+## 📝 Document Templates
 
-### 设计画布模板
+### Design Canvas Template
 
-位置: `docs/templates/design-canvas-template.md`
+Location: `docs/templates/design-canvas-template.md`
 
-包含:
-- 问题陈述
-- 架构设计
-- API 设计
-- 数据模型
-- UI 设计
-- 安全考虑
+Includes:
+- Problem statement
+- Architecture design
+- API design
+- Data model
+- UI design
+- Security considerations
 
-### 测试用例模板
+### Test Case Template
 
-位置: `docs/templates/test-case-template.md`
+Location: `docs/templates/test-case-template.md`
 
-包含:
-- 测试场景定义
-- 测试步骤
-- 预期结果
-- 优先级标记
-- 验收标准
+Includes:
+- Test scenario definitions
+- Test steps
+- Expected results
+- Priority markers
+- Acceptance criteria
 
-## 🔐 依赖的 Claude Code Plugins
+## 🔐 Required Claude Code Plugins
 
-确保启用以下 Claude Code 官方插件:
+Ensure these official Claude Code plugins are enabled:
 
-- `code-simplifier@claude-plugins-official` - 代码简化
-- `pr-review-toolkit@claude-plugins-official` - PR 审查
+- `code-simplifier@claude-plugins-official` - Code simplification
+- `pr-review-toolkit@claude-plugins-official` - PR review
 
 ## 📊 GitHub Actions
 
-默认 CI 包含:
+CI workflow needs to be added manually (see `docs/github-actions-setup.md`).
+
+Default CI includes:
 - Lint & Type Check
 - Unit Tests (with coverage)
 - Build
 
-可选启用:
+Optional:
 - E2E Tests (Playwright)
 - Deploy Preview
 
-## 🤝 参考项目
+> **Note**: Due to GitHub token permission restrictions, CI workflow files need to be added manually.
+> See `docs/github-actions-setup.md` for complete configuration instructions.
 
-本模板参考自 [VidSyllabus](https://github.com/zxkane/VidSyllabus) 项目的 Claude Code memory 和 hook 系统实现。
+## 🤝 Reference Project
+
+This template is based on the Claude Code memory and hook system implementation from [VidSyllabus](https://github.com/zxkane/VidSyllabus).
 
 ## 📄 License
 
