@@ -78,6 +78,7 @@ jobs:
         uses: codecov/codecov-action@v4
         if: always()
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           fail_ci_if_error: false
 
@@ -161,3 +162,21 @@ Based on your project requirements, you may need to adjust:
 3. **Test commands**: Adjust test commands based on your `package.json`
 4. **Build output directory**: Change `dist/` to your actual output directory
 5. **Branch names**: If your main branch isn't `main` or `master`, adjust accordingly
+
+## Required Secrets
+
+To use the CI workflow, you need to configure the following GitHub secrets:
+
+### CODECOV_TOKEN (Optional but Recommended)
+
+For secure coverage report uploads:
+
+1. Sign up at [codecov.io](https://codecov.io) and connect your repository
+2. Get your repository upload token from Codecov
+3. Add it as a GitHub secret:
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Click "New repository secret"
+   - Name: `CODECOV_TOKEN`
+   - Value: Your Codecov upload token
+
+> **Note**: Without the token, coverage uploads may fail or be vulnerable to security issues.
