@@ -27,6 +27,11 @@
             "type": "command",
             "command": ".claude/hooks/check-unit-tests.sh",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/warn-skip-verification.sh",
+            "timeout": 5
           }
         ]
       },
@@ -74,6 +79,26 @@
             "type": "command",
             "command": ".claude/hooks/post-git-push.sh",
             "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-file-edit-reminder.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-file-edit-reminder.sh",
+            "timeout": 5
           }
         ]
       }

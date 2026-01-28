@@ -26,6 +26,8 @@
 │       ├── check-code-simplifier.sh # 代码简化检查
 │       ├── check-pr-review.sh       # PR 审查检查
 │       ├── check-unit-tests.sh      # 单元测试检查
+│       ├── warn-skip-verification.sh # --no-verify 警告
+│       ├── post-file-edit-reminder.sh # 文件编辑后提醒
 │       ├── post-git-action-clear.sh # Git 操作后状态清理
 │       ├── post-git-push.sh         # Push 后验证提醒
 │       └── verify-completion.sh     # 任务完成验证
@@ -98,6 +100,7 @@ Step 8: E2E 测试 (Chrome DevTools)
 | check-code-simplifier | git commit | **阻止** 未审查的 commit |
 | check-pr-review | git push | **阻止** 未审查的 push |
 | check-unit-tests | git commit | 提醒运行单元测试 |
+| warn-skip-verification | git --no-verify | 警告跳过验证 |
 
 ### PostToolUse Hooks
 
@@ -105,6 +108,7 @@ Step 8: E2E 测试 (Chrome DevTools)
 |------|---------|------|
 | post-git-action-clear | git commit/push 成功 | 清理已完成的状态 |
 | post-git-push | git push 成功 | 提醒验证 CI 和 E2E |
+| post-file-edit-reminder | Write/Edit 源代码 | 提醒运行测试 |
 
 ### Stop Hook
 
