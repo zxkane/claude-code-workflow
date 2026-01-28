@@ -46,10 +46,10 @@ A development workflow template for Claude Code that enforces end-to-end develop
 
 ```bash
 # Using GitHub CLI
-gh repo create my-project --template your-username/claude-code-workflow
+gh repo create my-project --template zxkane/claude-code-workflow
 
 # Or manually clone
-git clone https://github.com/your-username/claude-code-workflow.git my-project
+git clone https://github.com/zxkane/claude-code-workflow.git my-project
 cd my-project
 rm -rf .git
 git init
