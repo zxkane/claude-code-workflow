@@ -23,11 +23,18 @@ if [ "$#" -ne 5 ]; then
     exit 1
 fi
 
-OWNER="$1"
-REPO="$2"
-PR_NUMBER="$3"
-COMMENT_ID="$4"
+# Sanitize inputs to prevent command injection
+OWNER=$(printf '%s' "$1" | sed 's/[^a-zA-Z0-9._-]//g')
+REPO=$(printf '%s' "$2" | sed 's/[^a-zA-Z0-9._-]//g')
+PR_NUMBER=$(printf '%d' "$3" 2>/dev/null || echo '0')
+COMMENT_ID=$(printf '%s' "$4" | sed 's/[^0-9]//g')
 MESSAGE="$5"
+
+# Validate inputs
+if [ -z "$OWNER" ] || [ -z "$REPO" ] || [ "$PR_NUMBER" -eq 0 ] || [ -z "$COMMENT_ID" ]; then
+    echo "Error: Invalid arguments provided"
+    exit 1
+fi
 
 echo "Replying to comment $COMMENT_ID on PR #$PR_NUMBER..."
 

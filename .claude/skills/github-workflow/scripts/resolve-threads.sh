@@ -21,16 +21,23 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 
-OWNER="$1"
-REPO="$2"
-PR_NUMBER="$3"
+# Sanitize inputs to prevent command injection
+OWNER=$(printf '%s' "$1" | sed 's/[^a-zA-Z0-9._-]//g')
+REPO=$(printf '%s' "$2" | sed 's/[^a-zA-Z0-9._-]//g')
+PR_NUMBER=$(printf '%d' "$3" 2>/dev/null || echo '0')
+
+# Validate inputs
+if [ -z "$OWNER" ] || [ -z "$REPO" ] || [ "$PR_NUMBER" -eq 0 ]; then
+    echo "Error: Invalid arguments provided"
+    exit 1
+fi
 
 echo "Fetching unresolved review threads for PR #$PR_NUMBER..."
 
-# Get unresolved thread IDs
+# Get unresolved thread IDs with escaped variables
 THREAD_IDS=$(gh api graphql -f query="
 query {
-  repository(owner: \"$OWNER\", name: \"$REPO\") {
+  repository(owner: \"$(printf '%s' "$OWNER" | sed 's/["\\]/\\&/g')\", name: \"$(printf '%s' "$REPO" | sed 's/["\\]/\\&/g')\") {
     pullRequest(number: $PR_NUMBER) {
       reviewThreads(first: 50) {
         nodes {
@@ -59,9 +66,11 @@ FAILED=0
 while read thread_id; do
     if [ -n "$thread_id" ]; then
         echo -n "Resolving thread $thread_id... "
+        # Escape thread_id for GraphQL
+        escaped_thread_id=$(printf '%s' "$thread_id" | sed 's/["\\]/\\&/g')
         result=$(gh api graphql -f query="
 mutation {
-  resolveReviewThread(input: {threadId: \"$thread_id\"}) {
+  resolveReviewThread(input: {threadId: \"$escaped_thread_id\"}) {
     thread { isResolved }
   }
 }" --jq '.data.resolveReviewThread.thread.isResolved' 2>/dev/null)
