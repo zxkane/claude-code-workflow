@@ -18,19 +18,28 @@ A development workflow template for Claude Code that enforces end-to-end develop
 ├── CLAUDE.md                     # Project config and workflow documentation
 ├── .claude/
 │   ├── settings.json            # Claude Code hooks configuration
-│   └── hooks/                   # Hook scripts
-│       ├── lib.sh               # Shared utility functions
-│       ├── state-manager.sh     # Workflow state management
-│       ├── check-design-canvas.sh   # Design canvas check
-│       ├── check-test-plan.sh       # Test plan check
-│       ├── check-code-simplifier.sh # Code simplification check
-│       ├── check-pr-review.sh       # PR review check
-│       ├── check-unit-tests.sh      # Unit tests check
-│       ├── warn-skip-verification.sh # --no-verify warning
-│       ├── post-file-edit-reminder.sh # Post-edit reminder
-│       ├── post-git-action-clear.sh # Git action state cleanup
-│       ├── post-git-push.sh         # Post-push verification reminder
-│       └── verify-completion.sh     # Task completion verification
+│   ├── hooks/                   # Hook scripts
+│   │   ├── lib.sh               # Shared utility functions
+│   │   ├── state-manager.sh     # Workflow state management
+│   │   ├── check-design-canvas.sh   # Design canvas check
+│   │   ├── check-test-plan.sh       # Test plan check
+│   │   ├── check-code-simplifier.sh # Code simplification check
+│   │   ├── check-pr-review.sh       # PR review check
+│   │   ├── check-unit-tests.sh      # Unit tests check
+│   │   ├── warn-skip-verification.sh # --no-verify warning
+│   │   ├── post-file-edit-reminder.sh # Post-edit reminder
+│   │   ├── post-git-action-clear.sh # Git action state cleanup
+│   │   ├── post-git-push.sh         # Post-push verification reminder
+│   │   └── verify-completion.sh     # Task completion verification
+│   └── skills/                  # Claude Code skills
+│       └── github-workflow/     # GitHub development workflow skill
+│           ├── SKILL.md         # Main skill definition (12-step workflow)
+│           ├── references/      # Reference documentation
+│           │   ├── commit-conventions.md  # Branch naming & commit standards
+│           │   └── review-commands.md     # GitHub CLI & GraphQL commands
+│           └── scripts/         # Utility scripts
+│               ├── reply-to-comments.sh   # Reply to PR review comments
+│               └── resolve-threads.sh     # Batch resolve review threads
 ├── docs/
 │   ├── designs/                 # Design canvas documents
 │   ├── test-cases/              # Test case documents
@@ -64,6 +73,61 @@ git init
 ### 3. Start Development
 
 When using Claude Code for development, hooks will automatically enforce the workflow.
+
+## 🎨 Using Skills to Follow the Workflow
+
+The `github-workflow` skill provides Claude Code with comprehensive guidance to follow the development workflow. Skills are automatically triggered by natural language prompts or can be invoked via slash commands.
+
+### Trigger Phrases (Natural Language)
+
+Claude Code will automatically activate the `github-workflow` skill when you use these phrases:
+
+| Category | Example Prompts |
+|----------|-----------------|
+| **Design** | "design a feature", "create UI mockup", "create design canvas" |
+| **PR Management** | "create a PR", "push changes", "merge PR" |
+| **Code Review** | "address review comments", "resolve review threads", "handle reviewer findings" |
+| **Bot Reviews** | "/q review", "/codex review", "respond to Amazon Q", "respond to Codex" |
+| **CI/CD** | "check CI status", "wait for checks to pass" |
+
+### Slash Command
+
+You can also explicitly invoke the skill:
+
+```
+/github-workflow <action>
+```
+
+Examples:
+```
+/github-workflow check the review comments
+/github-workflow create a PR for this feature
+/github-workflow resolve all review threads
+```
+
+### How It Works
+
+1. **Skill Detection**: When you mention workflow-related tasks, Claude Code automatically loads the `github-workflow` skill
+2. **Step-by-Step Guidance**: The skill provides the 12-step workflow with detailed instructions
+3. **Tool Integration**: Uses Pencil MCP for design, GitHub MCP/CLI for PR management, Chrome DevTools for E2E testing
+4. **Hook Enforcement**: Pre/Post hooks validate each step is completed before proceeding
+
+### Workflow Automation Example
+
+```
+User: "I want to add a new feature for user authentication"
+
+Claude Code will:
+1. Load github-workflow skill automatically
+2. Guide you through:
+   - Step 1: Create design canvas using Pencil tool
+   - Step 2: Write test cases (TDD)
+   - Step 3-4: Implementation + Unit tests
+   - Step 5-6: Code review agents (code-simplifier, pr-review)
+   - Step 7: Create PR and monitor CI
+   - Step 8-11: Handle reviewer bot comments
+   - Step 12: E2E verification
+```
 
 ## 🔧 Development Workflow
 
@@ -113,6 +177,37 @@ Step 8: E2E Tests (Chrome DevTools)
 | Hook | Trigger | Behavior |
 |------|---------|----------|
 | verify-completion | Task end | **Blocks** tasks without verification |
+
+## 🔗 MCP Tool Integration
+
+The workflow integrates with several MCP (Model Context Protocol) tools:
+
+| Tool | Purpose | Workflow Step |
+|------|---------|---------------|
+| **Pencil MCP** | Design canvas creation (`.pen` files) | Step 1: Design |
+| **GitHub MCP** | PR creation, review management | Steps 7-11: PR & Review |
+| **Chrome DevTools MCP** | E2E testing on preview environments | Step 12: E2E Tests |
+
+### Pencil Tool Commands
+
+```
+get_editor_state()           # Check current .pen file status
+open_document("path.pen")    # Open existing or create new design
+get_guidelines(topic)        # Get design guidelines
+get_style_guide(tags)        # Get style inspiration
+batch_design(operations)     # Create design elements
+get_screenshot()             # Validate design visually
+```
+
+### GitHub Workflow Scripts
+
+```bash
+# Reply to a specific review comment
+.claude/skills/github-workflow/scripts/reply-to-comments.sh <owner> <repo> <pr> <comment_id> "<message>"
+
+# Resolve all unresolved review threads
+.claude/skills/github-workflow/scripts/resolve-threads.sh <owner> <repo> <pr>
+```
 
 ## 🛠 State Management
 
@@ -164,8 +259,18 @@ Includes:
 
 Ensure these official Claude Code plugins are enabled:
 
-- `code-simplifier@claude-plugins-official` - Code simplification
-- `pr-review-toolkit@claude-plugins-official` - PR review
+- `code-simplifier@claude-plugins-official` - Code simplification review
+- `pr-review-toolkit@claude-plugins-official` - Comprehensive PR review
+
+### Optional MCP Servers
+
+For full workflow support, configure these MCP servers:
+
+| Server | Purpose | Configuration |
+|--------|---------|---------------|
+| Pencil | Design canvas creation | See Pencil MCP documentation |
+| GitHub | PR and review management | `gh auth login` for CLI access |
+| Chrome DevTools | E2E testing | Chrome with remote debugging enabled |
 
 ## 📊 GitHub Actions
 
