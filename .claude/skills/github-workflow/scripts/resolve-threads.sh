@@ -51,11 +51,12 @@ fi
 THREAD_COUNT=$(echo "$THREAD_IDS" | wc -l | tr -d ' ')
 echo "Found $THREAD_COUNT unresolved thread(s)"
 
-# Resolve each thread
+# Resolve each thread and track results
 RESOLVED=0
 FAILED=0
 
-echo "$THREAD_IDS" | while read thread_id; do
+# Use here-string to avoid subshell (pipe creates subshell where variable updates are lost)
+while read thread_id; do
     if [ -n "$thread_id" ]; then
         echo -n "Resolving thread $thread_id... "
         result=$(gh api graphql -f query="
@@ -67,12 +68,16 @@ mutation {
 
         if [ "$result" = "true" ]; then
             echo "OK"
+            RESOLVED=$((RESOLVED + 1))
         else
             echo "FAILED"
+            FAILED=$((FAILED + 1))
         fi
     fi
-done
+done <<< "$THREAD_IDS"
 
 echo ""
-echo "Done! Run the following to verify:"
+echo "Summary: $RESOLVED resolved, $FAILED failed"
+echo ""
+echo "To verify, run:"
 echo "  gh api graphql -f query='query { repository(owner: \"$OWNER\", name: \"$REPO\") { pullRequest(number: $PR_NUMBER) { reviewThreads(first: 50) { nodes { isResolved } } } } }' --jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)] | length'"
