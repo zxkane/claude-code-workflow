@@ -73,20 +73,68 @@ This project enforces a strict end-to-end development workflow through Claude Co
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Step 1: Design Canvas
+### Step 1: Design Canvas (Pencil Tool)
 
-**Tool**: Pencil (or other design tools)
+**Tool**: Pencil MCP (`.pen` files)
+
+**⚠️ CRITICAL: Always start feature development with a design canvas using Pencil**
 
 - Input: User requirements / PRD / Bug description
-- Output: Design canvas document (`docs/designs/<feature>.md`)
-- Tasks:
-  1. Understand requirements, define scope and boundaries
-  2. Create or update design canvas including:
-     - Feature architecture diagram
-     - Data flow diagram
-     - UI mockups (if applicable)
-     - API design (if applicable)
-  3. Mark design status as `Complete`
+- Output: Design canvas document (`docs/designs/<feature>.pen`)
+
+#### Pencil Tool Workflow
+
+1. **Check editor state**:
+   ```
+   Use get_editor_state() to see current .pen file status
+   ```
+
+2. **Open or create design file**:
+   ```
+   Use open_document("docs/designs/<feature>.pen") or open_document("new")
+   ```
+
+3. **Get design guidelines** (optional):
+   ```
+   Use get_guidelines(topic="landing-page|table|tailwind|code")
+   ```
+
+4. **Get style guide** for consistent design:
+   ```
+   Use get_style_guide_tags() to discover available tags
+   Use get_style_guide(tags=["modern", "dashboard"]) for inspiration
+   ```
+
+5. **Create design elements**:
+   ```
+   Use batch_design(operations) to create:
+   - UI mockups and wireframes
+   - Component hierarchy diagrams
+   - Data flow visualizations
+   - Architecture diagrams
+   ```
+
+6. **Validate design visually**:
+   ```
+   Use get_screenshot() to verify the design looks correct
+   ```
+
+#### Design Canvas Content
+
+- Feature architecture diagram
+- Data flow diagram
+- UI mockups (if applicable)
+- API design (if applicable)
+- Component specifications
+- Design decisions and rationale
+
+#### Design Approval
+
+Before proceeding to implementation:
+1. Present the design canvas to the user
+2. Get explicit approval
+3. Document any feedback or changes
+4. Mark design status as `Approved`
 
 ### Step 2: Test Case Design (Test First - Mandatory)
 
@@ -196,7 +244,7 @@ This project enforces a strict end-to-end development workflow through Claude Co
 
 Before merging any PR, confirm:
 
-- [ ] Design canvas created/updated (`docs/designs/<feature>.md`)
+- [ ] Design canvas created/updated (`docs/designs/<feature>.pen`)
 - [ ] Test case document created (`docs/test-cases/<feature>.md`)
 - [ ] Feature code complete and locally verified
 - [ ] Unit test coverage >80%
@@ -241,19 +289,28 @@ project-root/
 ├── CLAUDE.md                     # Project config and workflow (this file)
 ├── .claude/
 │   ├── settings.json            # Claude Code hooks configuration
-│   └── hooks/                   # Hook scripts
-│       ├── lib.sh               # Shared utility functions
-│       ├── state-manager.sh     # State manager
-│       ├── check-design-canvas.sh
-│       ├── check-test-plan.sh
-│       ├── check-code-simplifier.sh
-│       ├── check-pr-review.sh
-│       ├── check-unit-tests.sh
-│       ├── post-git-action-clear.sh
-│       ├── post-git-push.sh
-│       └── verify-completion.sh
+│   ├── hooks/                   # Hook scripts
+│   │   ├── lib.sh               # Shared utility functions
+│   │   ├── state-manager.sh     # State manager
+│   │   ├── check-design-canvas.sh
+│   │   ├── check-test-plan.sh
+│   │   ├── check-code-simplifier.sh
+│   │   ├── check-pr-review.sh
+│   │   ├── check-unit-tests.sh
+│   │   ├── post-git-action-clear.sh
+│   │   ├── post-git-push.sh
+│   │   └── verify-completion.sh
+│   └── skills/                  # Claude Code skills
+│       └── github-workflow/     # GitHub development workflow skill
+│           ├── SKILL.md         # Main skill definition
+│           ├── references/      # Reference documentation
+│           │   ├── commit-conventions.md
+│           │   └── review-commands.md
+│           └── scripts/         # Utility scripts
+│               ├── reply-to-comments.sh
+│               └── resolve-threads.sh
 ├── docs/
-│   ├── designs/                 # Design canvas documents
+│   ├── designs/                 # Design canvas documents (.pen files)
 │   ├── test-cases/              # Test case documents
 │   └── templates/               # Document templates
 ├── src/                         # Source code
@@ -286,3 +343,36 @@ project-root/
 ## Security Best Practices
 
 [Fill in security considerations based on your project]
+
+---
+
+## Skills Reference
+
+### GitHub Workflow Skill
+
+The `github-workflow` skill provides standardized guidance for the complete development workflow.
+
+**Trigger phrases**: "design a feature", "create UI mockup", "create a PR", "address review comments", "resolve review threads", "/q review", "/codex review", "merge PR", "push changes", "check CI status"
+
+**Location**: `.claude/skills/github-workflow/SKILL.md`
+
+**Key features**:
+- Design Canvas workflow using Pencil tool
+- Branch naming and commit conventions
+- PR creation and review process
+- Reviewer bot interaction (Amazon Q, Codex)
+- CI/CD check monitoring
+- Review thread management
+
+**Utility scripts**:
+```bash
+# Reply to a specific review comment
+.claude/skills/github-workflow/scripts/reply-to-comments.sh <owner> <repo> <pr> <comment_id> "<message>"
+
+# Resolve all unresolved review threads
+.claude/skills/github-workflow/scripts/resolve-threads.sh <owner> <repo> <pr>
+```
+
+**Reference documentation**:
+- `references/commit-conventions.md` - Branch naming and commit message standards
+- `references/review-commands.md` - GitHub CLI and GraphQL commands
