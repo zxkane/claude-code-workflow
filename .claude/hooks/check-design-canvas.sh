@@ -17,6 +17,11 @@ fi
 # Get current branch
 current_branch=$(git branch --show-current 2>/dev/null || echo "")
 
+# Exit early if not in a branch (e.g., detached HEAD)
+if [[ -z "$current_branch" ]]; then
+  exit 0
+fi
+
 # Skip for main/master branches and fix/hotfix branches
 if [[ "$current_branch" =~ ^(main|master|fix/|hotfix/) ]]; then
   exit 0
@@ -42,6 +47,7 @@ design_dir="$project_root/docs/designs"
 
 # If design document exists, auto-mark as complete
 if [[ -d "$design_dir" ]]; then
+  shopt -s nullglob
   for design_file in "$design_dir"/*.md; do
     [[ -f "$design_file" ]] || continue
     base_name=$(basename "$design_file" .md)

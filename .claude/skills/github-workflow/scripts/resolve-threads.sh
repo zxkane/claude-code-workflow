@@ -34,12 +34,16 @@ fi
 
 echo "Fetching unresolved review threads for PR #$PR_NUMBER..."
 
-# Get unresolved thread IDs with escaped variables
-THREAD_IDS=$(gh api graphql -f query="
-query {
-  repository(owner: \"$(printf '%s' "$OWNER" | sed 's/["\\]/\\&/g')\", name: \"$(printf '%s' "$REPO" | sed 's/["\\]/\\&/g')\") {
-    pullRequest(number: $PR_NUMBER) {
-      reviewThreads(first: 50) {
+# Get unresolved thread IDs using parameterized GraphQL variables
+THREAD_IDS=$(gh api graphql \
+  -F owner="$OWNER" \
+  -F repo="$REPO" \
+  -F prNumber="$PR_NUMBER" \
+  -f query='
+query($owner: String!, $repo: String!, $prNumber: Int!) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $prNumber) {
+      reviewThreads(first: 100) {
         nodes {
           id
           isResolved
@@ -47,7 +51,7 @@ query {
       }
     }
   }
-}" --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .id')
+}' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .id')
 
 if [ -z "$THREAD_IDS" ]; then
     echo "No unresolved threads found!"
@@ -66,14 +70,14 @@ FAILED=0
 while read thread_id; do
     if [ -n "$thread_id" ]; then
         echo -n "Resolving thread $thread_id... "
-        # Escape thread_id for GraphQL
-        escaped_thread_id=$(printf '%s' "$thread_id" | sed 's/["\\]/\\&/g')
-        result=$(gh api graphql -f query="
-mutation {
-  resolveReviewThread(input: {threadId: \"$escaped_thread_id\"}) {
+        result=$(gh api graphql \
+          -F threadId="$thread_id" \
+          -f query='
+mutation($threadId: ID!) {
+  resolveReviewThread(input: {threadId: $threadId}) {
     thread { isResolved }
   }
-}" --jq '.data.resolveReviewThread.thread.isResolved' 2>/dev/null)
+}' --jq '.data.resolveReviewThread.thread.isResolved' 2>/dev/null)
 
         if [ "$result" = "true" ]; then
             echo "OK"
@@ -87,6 +91,3 @@ done <<< "$THREAD_IDS"
 
 echo ""
 echo "Summary: $RESOLVED resolved, $FAILED failed"
-echo ""
-echo "To verify, run:"
-echo "  gh api graphql -f query='query { repository(owner: \"$OWNER\", name: \"$REPO\") { pullRequest(number: $PR_NUMBER) { reviewThreads(first: 50) { nodes { isResolved } } } } }' --jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)] | length'"
