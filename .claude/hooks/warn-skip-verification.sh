@@ -10,13 +10,13 @@ command=$(parse_command "$input")
 
 # Check if command contains --no-verify with git push or commit
 if [[ ! "$command" =~ git[[:space:]]+(push|commit).*--no-verify ]] && \
-   [[ ! "$command" =~ git[[:space:]]+(push|commit).*-n[[:space:]] ]]; then
+   [[ ! "$command" =~ git[[:space:]]+(push|commit).* -n([[:space:]]|$) ]]; then
   exit 0
 fi
 
 # Output warning (non-blocking)
 cat >&2 <<'EOF'
-## ⚠️ Skipping Verification Detected
+## Warning: Skipping Verification Detected
 
 You're using `--no-verify` which skips pre-commit/pre-push hooks.
 

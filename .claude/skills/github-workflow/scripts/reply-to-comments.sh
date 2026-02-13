@@ -31,7 +31,7 @@ COMMENT_ID=$(printf '%s' "$4" | sed 's/[^0-9]//g')
 MESSAGE="$5"
 
 # Validate inputs
-if [ -z "$OWNER" ] || [ -z "$REPO" ] || [ "$PR_NUMBER" -eq 0 ] || [ -z "$COMMENT_ID" ]; then
+if [ -z "$OWNER" ] || [ -z "$REPO" ] || [ "$PR_NUMBER" -eq 0 ] || [ -z "$COMMENT_ID" ] || [ -z "$MESSAGE" ]; then
     echo "Error: Invalid arguments provided"
     exit 1
 fi
@@ -42,6 +42,9 @@ gh api "repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments" \
   -X POST \
   -f body="$MESSAGE" \
   -F in_reply_to="$COMMENT_ID" \
-  --jq '{id: .id, url: .html_url}'
+  --jq '{id: .id, url: .html_url}' || {
+    echo "Error: Failed to post reply"
+    exit 1
+  }
 
 echo "Reply posted successfully!"
